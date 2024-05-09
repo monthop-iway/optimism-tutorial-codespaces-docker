@@ -9,6 +9,7 @@ optimism
 
 # Packages
 node_modules/
+pnpm-lock.yaml
 
 # Hardhat build outputs
 artifacts/
