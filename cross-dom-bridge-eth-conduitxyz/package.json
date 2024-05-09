@@ -1,0 +1,16 @@
+{
+  "name": "l1-to-l2-comm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@conduitxyz/sdk": "^0.0.3",
+    "@eth-optimism/sdk": "^2.0.2",
+    "conduit-sdk": "^0.0.3",
+    "dotenv": "^16.0.0",
+    "node-fetch": "^2.6.0"
+  },
+  "scripts": {
+    "script": "node index.js"
+  }
+}
