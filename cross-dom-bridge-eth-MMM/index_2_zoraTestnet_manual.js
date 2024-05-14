@@ -4,16 +4,16 @@
 
 const ethers = require("ethers")
 const optimismSDK = require("@eth-optimism/sdk")
-// const conduitSDK = require('@conduitxyz/sdk');
+const conduitSDK = require('@conduitxyz/sdk');
 require('dotenv').config()
 
 // Network information and utilities for this example network are available
 // here: https://app.conduit.xyz/published/view/conduit-opstack-demo-nhl9xsg0wg
 
 // Your settlment layer rpc url here
-const l1Url = 'https://rpc.testnet.jibchain.net' // 'https://rpc.jibchain.net' 'https://rpc.testnet.jibchain.net' // `https://eth-goerli.public.blastapi.io`
+const l1Url = 'https://rpc.ankr.com/eth_sepolia' // `https://eth-goerli.public.blastapi.io`
 // Your conduit rpc url here
-const l2Url = 'https://sepolia.optimism.io' // 'https://rpc.hera.jbcha.in' // 'https://sepolia.optimism.io' // `https://l2-conduit-opstack-demo-nhl9xsg0wg.t.conduit.xyz`
+const l2Url = 'https://sepolia.rpc.zora.energy' // `https://l2-conduit-opstack-demo-nhl9xsg0wg.t.conduit.xyz`
 const privateKey = process.env.PRIVATE_KEY
 
 // Global variable because we need them almost everywhere
@@ -26,29 +26,53 @@ const getSigners = async () => {
     const l1Wallet = new ethers.Wallet(privateKey, l1RpcProvider)
     const l2Wallet = new ethers.Wallet(privateKey, l2RpcProvider)
 
-    // console.log(l1RpcProvider)
-    // console.log(l2RpcProvider)
-    // console.log(l1Wallet)
-    // console.log(l2Wallet)
+    //console.log(l1RpcProvider)
+    //console.log(l2RpcProvider)
+    //console.log(l1Wallet)
+    //console.log(l2Wallet)
 
     return [l1Wallet, l2Wallet]
 }   // getSigners
 
 const setup = async() => {
   const [l1Signer, l2Signer] = await getSigners()
-
   addr = l1Signer.address
   // The network slug is available in the Network Information tab here: https://app.conduit.xyz/published/view/conduit-opstack-demo-3druhsesa1
   // let config = await conduitSDK.getOptimismConfiguration('conduit:zora-sepolia-0thyhxtf5e');
-  let config = {
-    l1ChainId: 88991, // 8899, 88991, 11155111 for Sepolia, 1 for Ethereum
-    l2ChainId: 11155420, // 7001, // 11155420 for OP Sepolia, 10 for OP Mainnet
+  let config = {  
+    l1ChainId: '11155111',
+    l2ChainId: '999999999',
+    contracts: {
+      l1: {
+        AddressManager: '0x27c9392144DFcB6dab113F737356C32435cD1D55',
+        BondManager: '0x0000000000000000000000000000000000000000',
+        CanonicalTransactionChain: '0x0000000000000000000000000000000000000000',
+        L1CrossDomainMessenger: '0x1bDBC0ae22bEc0c2f08B4dd836944b3E28fe9b7A',
+        L1StandardBridge: '0x5376f1D543dcbB5BD416c56C189e4cB7399fCcCB',
+        L2OutputOracle: '0x2615B481Bd3E5A1C0C7Ca3Da1bdc663E8615Ade9',
+        OptimismPortal: '0xeffE2C6cA9Ab797D418f0D91eA60807713f3536f',
+        StateCommitmentChain: '0x0000000000000000000000000000000000000000'
+      },
+      l2: {}
+    },
+    bridges: {
+      Standard: {
+        Adapter: optimismSDK.StandardBridgeAdapter,
+        l1Bridge: '0x5376f1D543dcbB5BD416c56C189e4cB7399fCcCB',
+        l2Bridge: '0x4200000000000000000000000000000000000010'
+      },
+      ETH: {
+        Adapter: optimismSDK.ETHBridgeAdapter,
+        l1Bridge: '0x5376f1D543dcbB5BD416c56C189e4cB7399fCcCB',
+        l2Bridge: '0x4200000000000000000000000000000000000010'
+      }
+    },
+    bedrock: true
   }
   console.log(config)
   config.l1SignerOrProvider = l1Signer
   config.l2SignerOrProvider = l2Signer
-  
-  // console.log(config)
+
     
   crossChainMessenger = new optimismSDK.CrossChainMessenger(config)
 }    // setup
@@ -133,14 +157,6 @@ main().then(() => process.exit(0))
   })
 
 
-/*
 
-C:\temp\optimism-tutorial\cross-dom-bridge-eth-MMM>node index_0_jibchainTestnet.js
-Error: cannot get contract AddressManager for unknown L2 chain ID 7001, you must provide an address
-    at getOEContract (C:\temp\optimism-tutorial\cross-dom-bridge-eth-MMM\node_modules\.pnpm\@eth-optimism+sdk@3.3.0_ethers@5.7.2\node_modules\@eth-optimism\sdk\dist\utils\contracts.js:104:19)
-    at getAllOEContracts (C:\temp\optimism-tutorial\cross-dom-bridge-eth-MMM\node_modules\.pnpm\@eth-optimism+sdk@3.3.0_ethers@5.7.2\node_modules\@eth-optimism\sdk\dist\utils\contracts.js:137:63)
-    at new CrossChainMessenger (C:\temp\optimism-tutorial\cross-dom-bridge-eth-MMM\node_modules\.pnpm\@eth-optimism+sdk@3.3.0_ethers@5.7.2\node_modules\@eth-optimism\sdk\dist\cross-chain-messenger.js:230:56) 
-    at setup (C:\temp\optimism-tutorial\cross-dom-bridge-eth-MMM\index_0_jibchainTestnet.js:50:25)      
-    at async main (C:\temp\optimism-tutorial\cross-dom-bridge-eth-MMM\index_0_jibchainTestnet.js:155:5) 
 
-*/
+

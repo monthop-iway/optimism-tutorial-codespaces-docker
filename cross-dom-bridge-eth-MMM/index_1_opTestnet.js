@@ -39,20 +39,17 @@ const setup = async() => {
   addr = l1Signer.address
   // The network slug is available in the Network Information tab here: https://app.conduit.xyz/published/view/conduit-opstack-demo-3druhsesa1
   // let config = await conduitSDK.getOptimismConfiguration('conduit:zora-sepolia-0thyhxtf5e');
-  // config.l1SignerOrProvider = l1Signer
-  // config.l2SignerOrProvider = l2Signer
+  let config = {
+    l1ChainId: 11155111, // 11155111 for Sepolia, 1 for Ethereum
+    l2ChainId: 11155420, // 11155420 for OP Sepolia, 10 for OP Mainnet
+  }
+  console.log(config)  
+  config.l1SignerOrProvider = l1Signer
+  config.l2SignerOrProvider = l2Signer
   
   // console.log(config)
     
-  // crossChainMessenger = new optimismSDK.CrossChainMessenger(config)
-
-  crossChainMessenger = new optimismSDK.CrossChainMessenger({
-    l1ChainId: 11155111, // 11155111 for Sepolia, 1 for Ethereum
-    l2ChainId: 11155420, // 11155420 for OP Sepolia, 10 for OP Mainnet
-    l1SignerOrProvider: l1Signer,
-    l2SignerOrProvider: l2Signer,
-  })
-
+  crossChainMessenger = new optimismSDK.CrossChainMessenger(config)
 }    // setup
 
 const gwei = BigInt(1e9)

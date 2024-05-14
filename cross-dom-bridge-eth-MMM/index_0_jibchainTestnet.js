@@ -40,56 +40,58 @@ const setup = async() => {
   addr = l1Signer.address
   // The network slug is available in the Network Information tab here: https://app.conduit.xyz/published/view/conduit-opstack-demo-3druhsesa1
   // let config = await conduitSDK.getOptimismConfiguration('conduit:zora-sepolia-0thyhxtf5e');
-  // config.l1SignerOrProvider = l1Signer
-  // config.l2SignerOrProvider = l2Signer
+  let config = {
+    l1ChainId: 88991, // 8899, 88991, 11155111 for Sepolia, 1 for Ethereum
+    l2ChainId: 7001, // 7001, // 11155420 for OP Sepolia, 10 for OP Mainnet
+    contracts: {
+      l1: {
+        AddressManager: '0x43791148430812864D903fD4eB75e798665AcFc8',
+        BondManager: '0x0000000000000000000000000000000000000000',
+        CanonicalTransactionChain: '0x0000000000000000000000000000000000000000',
+        L1CrossDomainMessenger: '0x4250A8AF9ceDa0bDdF5Fd3568330b6ce6310bE58',
+        L1StandardBridge: '0x3C91efB30c55FbD5782be4BbA3D9628C1074a18D',
+        L2OutputOracle: '0x74Ad6E0FB793eB5e6c1ff1225B03F5C5fFB7EF0c',
+        OptimismPortal: '0xEcA3B962eC275d4bA8BbE0500aC6d4086c6CE039',
+        StateCommitmentChain: '0x0000000000000000000000000000000000000000'
+      },
+      l2: {}
+    },
+/*
+https://github.com/nidz-the-fact/op-stack-bridge-Testing-erc20-to-native/blob/master/.example.env
+# Istance - erc20
+REACT_APP_L1_USDT=0x39BE211eAb65e05ba98af949d3e16F7A1683d94E
+REACT_APP_L2_USDT=0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000
+# 0x39BE211eAb65e05ba98af949d3e16F7A1683d94E
+# 0xDeadDeAddeAddEAddeadDEaDDEAdDeaDDeAD0000
+# 0x110648bc41CC74229a296C77c10e48742D6Db6EE
+# 0xe8Cc4515799792E91EaE08184Cd33b45c6685Cc8
+*/
+    bridges: {
+      Standard: {
+        Adapter: optimismSDK.StandardBridgeAdapter,
+        l1Bridge: '0x3C91efB30c55FbD5782be4BbA3D9628C1074a18D',
+        l2Bridge: '0x4200000000000000000000000000000000000010'
+      },
+      ETH: {
+        Adapter: optimismSDK.ETHBridgeAdapter,
+        l1Bridge: '0x3C91efB30c55FbD5782be4BbA3D9628C1074a18D',
+        l2Bridge: '0x4200000000000000000000000000000000000010'
+      }
+    },
+    bedrock: true
+  }
+  // console.log(config)  
+  config.l1SignerOrProvider = l1Signer
+  config.l2SignerOrProvider = l2Signer
   
   // console.log(config)
     
-  // crossChainMessenger = new optimismSDK.CrossChainMessenger(config)
-
-  crossChainMessenger = new optimismSDK.CrossChainMessenger({
-    l1ChainId: 88991, // 8899, 88991, 11155111 for Sepolia, 1 for Ethereum
-    l2ChainId: 7001, // 7001, // 11155420 for OP Sepolia, 10 for OP Mainnet
-    // contracts: {
-    //   l1: {
-    //     // AddressManager: '0x27c9392144DFcB6dab113F737356C32435cD1D55',
-    //     // BondManager: '0x0000000000000000000000000000000000000000',
-    //     // CanonicalTransactionChain: '0x0000000000000000000000000000000000000000',
-    //     // L1CrossDomainMessenger: '0x1bDBC0ae22bEc0c2f08B4dd836944b3E28fe9b7A',
-    //     // L1StandardBridge: '0x5376f1D543dcbB5BD416c56C189e4cB7399fCcCB',
-    //     // L2OutputOracle: '0x2615B481Bd3E5A1C0C7Ca3Da1bdc663E8615Ade9',
-    //     // OptimismPortal: '0xeffE2C6cA9Ab797D418f0D91eA60807713f3536f',
-    //     // StateCommitmentChain: '0x0000000000000000000000000000000000000000'
-    //   },
-    //   l2: {}
-    // },
-    // bridges: {
-    //   Standard: {
-    //     Adapter: [class StandardBridgeAdapter],
-    //     l1Bridge: '0x5376f1D543dcbB5BD416c56C189e4cB7399fCcCB',
-    //     l2Bridge: '0x4200000000000000000000000000000000000010'
-    //   },
-    //   ETH: {
-    //     Adapter: [class ETHBridgeAdapter extends StandardBridgeAdapter],
-    //     l1Bridge: '0x5376f1D543dcbB5BD416c56C189e4cB7399fCcCB',
-    //     l2Bridge: '0x4200000000000000000000000000000000000010'
-    //   }
-    // },
-    // bedrock: true,    
-    l1SignerOrProvider: l1Signer,
-    l2SignerOrProvider: l2Signer,
-  })
-
-  console.log(l1Signer)
-  console.log(l2Signer)  
-
-  console.log(crossChainMessenger)
-
+  crossChainMessenger = new optimismSDK.CrossChainMessenger(config)
 }    // setup
 
-const gwei = BigInt(1e9)
-const eth = gwei * gwei   // 10^18
-const centieth = eth/100n
+const gwei = BigInt(1e18) // BigInt(50000000) // L1:49, 993,556,534, 965,141,001
+// const eth = gwei * gwei   // 10^18
+// const centieth = eth/100n
 
 
 const reportBalances = async () => {
@@ -154,7 +156,7 @@ const withdrawETH = async () => {
 const main = async () => {
     await setup()
     await reportBalances()
-    // await depositETH()
+    await depositETH()
     // await withdrawETH()
 }  // main
 
